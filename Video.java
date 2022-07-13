@@ -8,6 +8,7 @@ public class Video {
 	public static final int NEW_RELEASE =2 ;
 
 	private int videoType ;
+	
 	public static final int VHS = 1 ;
 	public static final int CD = 2 ;
 	public static final int DVD = 3 ;
@@ -28,8 +29,19 @@ public class Video {
 			case VHS: pentalty = 1 ; break ;
 			case CD: pentalty = 2 ; break ;
 			case DVD: pentalty = 3 ; break ;
+			default: break;
 		}
 		return pentalty ;
+	}
+	
+	public int getDaysRentedLimit() {
+		int limit = 0 ;
+		switch ( videoType ) {
+			case VHS: limit = 5 ; break ;
+			case CD: limit = 3 ; break ;
+			case DVD: limit = 2 ; break ;
+		}
+		return limit;
 	}
 	public int getPriceCode() {
 		return priceCode;

@@ -49,20 +49,64 @@ public class Rental {
 	public int getDaysRentedLimit() {
 		int limit = 0 ;
 		int daysRented ;
-		if (getStatus() == 1) { // returned Video
-			long diff = returnDate.getTime() - rentDate.getTime();
-			daysRented = (int) (diff / (1000 * 60 * 60 * 24)) + 1;
-		} else { // not yet returned
-			long diff = new Date().getTime() - rentDate.getTime();
-			daysRented = (int) (diff / (1000 * 60 * 60 * 24)) + 1;
-		}
-		if ( daysRented <= 2) return limit ;
+		daysRented = getDaysRented();
+		if ( daysRented <= 2) return limit;
+		
+		return video.getDaysRentedLimit();
+	}
 
-		switch ( video.getVideoType() ) {
-			case Video.VHS: limit = 5 ; break ;
-			case Video.CD: limit = 3 ; break ;
-			case Video.DVD: limit = 2 ; break ;
+	public int getDaysRented() {
+		int daysRented;
+		long now;
+		if (getStatus() == 1) { // returned Video
+			now = returnDate.getTime();		
+		} else { // not yet returned
+			now = new Date().getTime();
 		}
-		return limit ;
+		long diff = now - rentDate.getTime();
+		daysRented = (int) (diff / (1000 * 60 * 60 * 24)) + 1;
+		return daysRented;
+	}
+	
+	public double getCharge() {
+		int daysRented = getDaysRented();
+		double charge = 0;
+		
+		switch (getVideoPriceCode()) {
+		case Video.REGULAR:
+			charge += 2;
+			if (daysRented > 2)
+				charge += (daysRented - 2) * 1.5;
+			break;
+		case Video.NEW_RELEASE:
+			charge = daysRented * 3;
+			break;
+		default:
+			break;
+		}
+		return charge;
+	}
+
+	public int getPoint() {
+		int point = 0;
+		int daysRented = getDaysRented();
+
+		point++;
+
+		if ((getVideoPriceCode() == Video.NEW_RELEASE) )
+			point++;
+
+		if ( daysRented > getDaysRentedLimit() )
+			point -= Math.min(point, getVideo().getLateReturnPointPenalty()) ;
+
+		return point;
+	}
+	
+	public String getVideoTitle() {
+		return video.getTitle();
+	}
+	
+	public int getVideoPriceCode() {
+		return video.getPriceCode();
 	}
 }
